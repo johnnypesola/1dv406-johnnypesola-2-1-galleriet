@@ -27,7 +27,12 @@
         <div class="content">
             <asp:Repeater ID="ThumbnailRepeater" runat="server">
                 <ItemTemplate>
-                    <img src="<%# Container.DataItem.ToString()  %>" />
+                    <asp:HyperLink ID="ThumbnailLink" runat="server"
+                        NavigateUrl='<%# DataBinder.Eval(Container.DataItem, "imagePath")  %>'
+                        CssClass='<%# DataBinder.Eval(Container.DataItem, "cssClass")  %>'
+                    >
+                        <asp:Image ID="ThumbnailImage" runat="server" ImageUrl='<%# DataBinder.Eval(Container.DataItem, "thumbNailPath")  %>' />
+                    </asp:HyperLink>
                 </ItemTemplate>
             </asp:Repeater>
         </div>
@@ -44,5 +49,7 @@
         <asp:RequiredFieldValidator ID="FileUploadRequired" runat="server" ErrorMessage="Var god välj en bild som ska laddas upp." ControlToValidate="FileUpload"></asp:RequiredFieldValidator>    
         
     </form>
+
+    <script type="text/javascript" src="/Scripts/jquery.scrollTo.js" />
 </body>
 </html>

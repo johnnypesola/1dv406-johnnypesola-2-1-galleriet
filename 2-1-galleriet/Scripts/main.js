@@ -1,14 +1,15 @@
 ﻿
 window.onload = function () {
 
-    // Code for selecting user input text when page loads
-    var inputElement;
+    // Scroll to active thumbnail if there is one.
+    $("#ThumbnailContainer .content").scrollTo($("a.active"), {offset: -200});
 
-    inputElement = document.getElementById("UserInputTextBox");
-
-    inputElement.focus();
-    inputElement.select();
-
+    // Add closebutton to messageboxes
+    $(".success-message, .error-message").each(function (element) {
+        $(this).append('<a class="close" href="#">&#215;</a>').click(function () {
+            $(this).fadeOut();
+        });
+    })
 }
 
 

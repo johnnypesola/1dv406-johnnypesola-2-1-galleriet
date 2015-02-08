@@ -19,13 +19,19 @@ namespace _2_1_galleriet
         public const string IMAGE_PATH = "Content/upload/img";
         const int THUMBNAIL_WIDTH = 300;
         const int THUMBNAIL_HEIGHT = 150;
-        const string THUMBNAIL_PATH = "Content/upload/img/tn";
+        public const string THUMBNAIL_PATH = "Content/upload/img/tn";
         const string THUMBNAIL_PRE_EXTENSION = "tn_";
         static private IReadOnlyCollection<string> ApprovedExtensionsCollection;
         static readonly Regex ApprovedExtensionsRegex;
         static readonly string UploadImagePath;
         static readonly string UploadThumbnailPath;
         static readonly Regex SanitizePathRegex;
+
+        public enum ImageType
+        {
+            LargeImage,
+            Thumbnail
+        }
 
         // Constructors
         static Gallery()
@@ -48,7 +54,7 @@ namespace _2_1_galleriet
         }
 
         // Methods
-        public IEnumerable<string> GetImageNames(bool getThumbnails = false)
+        public IEnumerable<string> GetImageNames(ImageType getImageType = ImageType.LargeImage)
         {
             char[] trimStartDot;
             IEnumerable<string> files;
@@ -59,7 +65,7 @@ namespace _2_1_galleriet
             trimStartDot = new char[] { '.' };
 
             // Get all files from directory
-            files = Directory.GetFiles(getThumbnails ? UploadThumbnailPath : UploadImagePath)
+            files = Directory.GetFiles(getImageType == ImageType.Thumbnail ? UploadThumbnailPath : UploadImagePath)
 
                 // Select files with right extensions using linq
                 .Where(f => ApprovedExtensionsCollection.Contains(Path.GetExtension(f).TrimStart(trimStartDot).ToLower()))
@@ -70,7 +76,7 @@ namespace _2_1_galleriet
             foreach (var file in files)
             {
                 fileInfo = new FileInfo(file);
-                returnFilesList.Add(String.Format("{0}/{1}", (getThumbnails ? THUMBNAIL_PATH : IMAGE_PATH), fileInfo.Name));
+                returnFilesList.Add(fileInfo.Name);
             }
 
             // Return  value
@@ -166,7 +172,6 @@ namespace _2_1_galleriet
                 throw new ArgumentException("Filen kunde inte tolkas som en giltig bild.");
             }
 
-            
             // Resize and Save image
             resizeImageTo(image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT).Save(string.Format("{0}/{1}", UploadImagePath, fileName));
 
@@ -181,9 +186,29 @@ namespace _2_1_galleriet
             int newWidth, newHeight;
             Graphics graphic;
 
-            newWidth = maxHeight * OrginalImage.Width / OrginalImage.Height;
-            newHeight = maxHeight;
-
+            // If image needs resizeing
+            if (OrginalImage.Width > maxWidth || OrginalImage.Height > maxHeight)
+            {
+                // If Height is above maxvalue
+                if(OrginalImage.Height > maxHeight)
+                {
+                    newHeight = maxHeight;
+                    newWidth = OrginalImage.Width * maxHeight / OrginalImage.Height;
+                }
+                // Width is above maxvalue
+                else 
+                {
+                    newWidth = maxWidth;
+                    newHeight = OrginalImage.Height * maxWidth / OrginalImage.Width;
+                }
+            }
+            // Image does not need resizeing
+            else
+            {
+                newWidth = OrginalImage.Width;
+                newHeight = OrginalImage.Height;
+            }
+            
             // Create image with new dimensions
             graphic = Graphics.FromImage(new Bitmap(newWidth, newHeight));
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -19,6 +20,11 @@ namespace _2_1_galleriet
             this.Page.Validators.Add(customValidator);
         }
 
+        private string getPageName()
+        {
+            return Path.GetFileName(Page.AppRelativeVirtualPath);
+        }
+
         private void renderImage(string imageSrc)
         {
             ImageContainer.Controls.Add(new HtmlImage() {
@@ -30,13 +36,48 @@ namespace _2_1_galleriet
 
         private void renderThumbnails()
         {
-            IEnumerable<string> imageList;
+            string[] imageList, thumbNailList;
             Gallery galleryObj = new Gallery();
+            DataTable imageTable;
+            DataRow imageTableRow;
+            DataSet imageDataSet;
+            string imageGET;
+
+            // Get image name from get request
+            imageGET = Request.QueryString["img"];
+
+            
 
             // Get previously uploaded images
-            imageList = galleryObj.GetImageNames(true);
+            thumbNailList = galleryObj.GetImageNames(Gallery.ImageType.Thumbnail).ToArray();
+            imageList = galleryObj.GetImageNames(Gallery.ImageType.LargeImage).ToArray();
 
-            ThumbnailRepeater.DataSource = imageList;
+            // Build up a datasource containing thumbnaillist and imagelist
+            imageTable = new DataTable("imageTable");
+            imageTable.Columns.Add(new DataColumn("imagePath", typeof(string)));
+            imageTable.Columns.Add(new DataColumn("thumbNailPath", typeof(string)));
+            imageTable.Columns.Add(new DataColumn("cssClass", typeof(string)));
+
+            for(int i = 0; i < imageList.ToArray().Length; i++)
+            {
+                imageTableRow = imageTable.NewRow();
+
+                imageTableRow[0] = String.Format("{0}?img={1}", getPageName(), imageList[i]);
+                imageTableRow[1] = String.Format("{0}/{1}", Gallery.THUMBNAIL_PATH, thumbNailList[i]);
+
+                // Render css active class if this image should be active, compare GET request to image filename
+                if (imageGET != null && imageGET == imageList[i])
+                {
+                    imageTableRow[2] = "active";
+                }
+
+                imageTable.Rows.Add(imageTableRow);
+            }
+
+            imageDataSet = new DataSet("imageDataSet");
+            imageDataSet.Tables.Add(imageTable);
+
+            ThumbnailRepeater.DataSource = imageDataSet;
             ThumbnailRepeater.DataBind();
         }
 
@@ -90,9 +131,7 @@ namespace _2_1_galleriet
                     InfoPanel.CssClass = "success-message";
                     InfoPanelLiteral.Text = String.Format("Bilden {0} har laddats upp.", fileName);
 
-
-                    Response.Redirect(String.Format("Default.aspx?img={0}", fileName));
-
+                    //Response.Redirect(String.Format("{0}?img{1}", getPageName(), fileName));
                 }
                 catch (Exception error)
                 {

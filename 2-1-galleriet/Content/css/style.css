@@ -44,20 +44,46 @@ input {
     color: #AA0000;
     margin: 5px;
     padding: 5px;
-    background: #FFFFFF;
+    background: #FFF2F2;
     border-radius: 3px;
     border: 1px solid #DDDDDD;
+    position: relative;
 }
 
 .success-message {
     color: #00AA00;
     margin: 15px auto;
     padding: 10px 15px;
-    background: #FFFFFF;
+    background: #F2FFF2;
     border-radius: 3px;
     border: 1px solid #DDDDDD;
     width: 600px;
+    position: relative;
 }
+
+    .error-message .close, .success-message .close {
+        position: absolute;
+        display: block;
+        height: 16px;
+        line-height: 16px;
+        width: 16px;
+        top: 5px;
+        right: 5px;
+        padding: 0;
+        display: block;
+        border: 1px solid #DDDDDD;
+        font-size: 14px;
+        text-decoration: none;
+        background: #FFFFFF;
+        border-radius: 8px;
+        color: #000000;
+        cursor: pointer;
+    }
+
+        .error-message .close:hover, .success-message .close:hover {
+            background: #EEEEEE;
+            border: 1px solid #CCCCCC;
+        }
 
 fieldset {
     border: none;
@@ -91,7 +117,7 @@ fieldset {
     min-width: 100px;
     width: 600px;
 
-    height: 170px;
+    height: 180px;
 
     border-radius: 5px;
 
@@ -100,8 +126,9 @@ fieldset {
     box-shadow:         0px 0px 5px 0px rgba(50, 50, 50, 0.2);
 }
     #ThumbnailContainer .content {
-        height: 175px;
+        height: 185px;
         white-space: nowrap;
+        padding: 0 10px;
 
         overflow-x: scroll;
         overflow-y: hidden;
@@ -114,10 +141,26 @@ fieldset {
         z-index: 1;
     }
 
+    #ThumbnailContainer .content a {
+
+    }
+
+    #ThumbnailContainer .content a.active {
+        border: 1px solid #AAAADD;
+        display: inline-block;
+        background: #EEEEFF;
+    }
+
+    #ThumbnailContainer .content a.active img {
+        opacity: 0.8;
+        filter: grayscale(100%);
+        -webkit-filter: grayscale(100%);
+    }
+
     #ThumbnailContainer .left-fader {
 
         width: 50px;
-        height: 175px;
+        height: 185px;
         position: absolute;
         top: 0px;
         left: 20px;
@@ -135,7 +178,7 @@ fieldset {
     #ThumbnailContainer .right-fader {
 
         width: 50px;
-        height: 175px;
+        height: 185px;
         position: absolute;
         top: 0px;
         right: 20px;

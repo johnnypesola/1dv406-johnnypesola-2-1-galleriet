@@ -46,7 +46,7 @@ namespace _2_1_galleriet {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ThumbnailContainer;
+        protected global::System.Web.UI.WebControls.Panel ThumbnailContainer;
         
         /// <summary>
         /// ThumbnailRepeater control.
@@ -58,13 +58,13 @@ namespace _2_1_galleriet {
         protected global::System.Web.UI.WebControls.Repeater ThumbnailRepeater;
         
         /// <summary>
-        /// form1 control.
+        /// UploadForm control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.HtmlControls.HtmlForm UploadForm;
         
         /// <summary>
         /// ValidationSummary control.
@@ -110,5 +110,14 @@ namespace _2_1_galleriet {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator FileUploadRequired;
+        
+        /// <summary>
+        /// FileUploadRegularExpressionValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator FileUploadRegularExpressionValidator;
     }
 }

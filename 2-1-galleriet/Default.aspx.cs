@@ -46,59 +46,70 @@ namespace _2_1_galleriet
             // Get image name from get request
             imageGET = Request.QueryString["img"];
 
-            
-
             // Get previously uploaded images
-            thumbNailList = galleryObj.GetImageNames(Gallery.ImageType.Thumbnail).ToArray();
-            imageList = galleryObj.GetImageNames(Gallery.ImageType.LargeImage).ToArray();
+            thumbNailList = galleryObj.GetImageNames(Gallery.ImageType.Thumbnail);
+            imageList = galleryObj.GetImageNames(Gallery.ImageType.LargeImage);
 
-            // Build up a datasource containing thumbnaillist and imagelist
-            imageTable = new DataTable("imageTable");
-            imageTable.Columns.Add(new DataColumn("imagePath", typeof(string)));
-            imageTable.Columns.Add(new DataColumn("thumbNailPath", typeof(string)));
-            imageTable.Columns.Add(new DataColumn("cssClass", typeof(string)));
-
-            for(int i = 0; i < imageList.ToArray().Length; i++)
+            // Render thumbnails only if there are any
+            if (thumbNailList.Length > 0)
             {
-                imageTableRow = imageTable.NewRow();
+                // Build up a datasource containing thumbnaillist and imagelist
+                imageTable = new DataTable("imageTable");
+                imageTable.Columns.Add(new DataColumn("imagePath", typeof(string)));
+                imageTable.Columns.Add(new DataColumn("thumbNailPath", typeof(string)));
+                imageTable.Columns.Add(new DataColumn("cssClass", typeof(string)));
 
-                imageTableRow[0] = String.Format("{0}?img={1}", getPageName(), imageList[i]);
-                imageTableRow[1] = String.Format("{0}/{1}", Gallery.THUMBNAIL_PATH, thumbNailList[i]);
-
-                // Render css active class if this image should be active, compare GET request to image filename
-                if (imageGET != null && imageGET == imageList[i])
+                // Loop through thumbnails, fill datasource with data.
+                for (int i = 0; i < thumbNailList.Length; i++)
                 {
-                    imageTableRow[2] = "active";
+                    // New rable row
+                    imageTableRow = imageTable.NewRow();
+
+                    // New cells with data
+                    imageTableRow[0] = String.Format("{0}?img={1}", getPageName(), (imageList.Length == thumbNailList.Length ? imageList[i] : ""));
+                    imageTableRow[1] = String.Format("{0}/{1}", Gallery.THUMBNAIL_PATH, thumbNailList[i]);
+
+                    // Render css active class if this image should be active, compare GET request to image filename
+                    if (imageGET != null && imageList.Length == thumbNailList.Length && imageGET == imageList[i])
+                    {
+                        imageTableRow[2] = "active";
+                    }
+
+                    // Add row to image data table
+                    imageTable.Rows.Add(imageTableRow);
                 }
 
-                imageTable.Rows.Add(imageTableRow);
+                // Create dataset from table with data
+                imageDataSet = new DataSet("imageDataSet");
+                imageDataSet.Tables.Add(imageTable);
+
+                // Add image dataset as souce and bind it to Repeater
+                ThumbnailRepeater.DataSource = imageDataSet;
+                ThumbnailRepeater.DataBind();
+
+                // Show Thumbnail container
+                ThumbnailContainer.Visible = true;
             }
-
-            imageDataSet = new DataSet("imageDataSet");
-            imageDataSet.Tables.Add(imageTable);
-
-            ThumbnailRepeater.DataSource = imageDataSet;
-            ThumbnailRepeater.DataBind();
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if(!Page.IsPostBack)
+            string image;
+            Gallery gallery = new Gallery();
+
+            // Get image name from get request
+            image = Request.QueryString["img"];
+
+            // Render image only if it exists
+            if (image != null && gallery.ImageExists(image))
             {
-                string image;
-                Gallery gallery = new Gallery();
+                renderImage(String.Format("{0}/{1}", Gallery.IMAGE_PATH, image));
+            }
 
-                // Render thumbnails
+            if (!Page.IsPostBack)
+            {
+                // Render thumbnails must me called separately, to include uploaded image.
                 renderThumbnails();
-
-                // Get image name from get request
-                image = Request.QueryString["img"];
-
-                // Render image only if it exists
-                if (image != null && gallery.ImageExists(image))
-                {
-                    renderImage(String.Format("{0}/{1}", Gallery.IMAGE_PATH, image));
-                }
             }
         }
 
@@ -129,9 +140,11 @@ namespace _2_1_galleriet
 
                     InfoPanel.Visible = true;
                     InfoPanel.CssClass = "success-message";
-                    InfoPanelLiteral.Text = String.Format("Bilden {0} har laddats upp.", fileName);
+                    InfoPanelLiteral.Text = String.Format("Bilden '{0}' har laddats upp.", fileName);
 
-                    //Response.Redirect(String.Format("{0}?img{1}", getPageName(), fileName));
+                    //Response.Redirect(String.Format("{0}?img={1}", getPageName(), fileName));
+
+                    //renderImage(String.Format("{0}/{1}", Gallery.IMAGE_PATH, fileName));
                 }
                 catch (Exception error)
                 {

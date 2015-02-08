@@ -26,6 +26,7 @@ namespace _2_1_galleriet
         static readonly string UploadImagePath;
         static readonly string UploadThumbnailPath;
         static readonly Regex SanitizePathRegex;
+        static readonly Regex AlphanumericFileRegex;
 
         public enum ImageType
         {
@@ -51,10 +52,13 @@ namespace _2_1_galleriet
 
             // Set up approved extensions regex
             ApprovedExtensionsRegex = new Regex(@"^.*\.(" + string.Join("|", ApprovedExtensionsCollection) + ")$");
+
+            // Set up alphanumeric regex
+            AlphanumericFileRegex = new Regex("[^a-zA-Z0-9_.]");
         }
 
         // Methods
-        public IEnumerable<string> GetImageNames(ImageType getImageType = ImageType.LargeImage)
+        public string[] GetImageNames(ImageType getImageType = ImageType.LargeImage)
         {
             char[] trimStartDot;
             IEnumerable<string> files;
@@ -80,22 +84,33 @@ namespace _2_1_galleriet
             }
 
             // Return  value
-            return returnFilesList;
+            return returnFilesList.ToArray();
         }
 
-        public bool ImageExists(string name)
+        public bool ImageExists(string fileName)
         {
             /*
                 *  ImageExists är en statisk metod som returnerar true om en bild med angivet namn finns katalogen
                 för uppladdade bilder; annars false.
                 */
 
-            if(!IsValidFileName(name))
+            // Return false if it isnt a valid filename.
+            if (!IsValidFileName(fileName))
             {
-                throw new ArgumentException("The given argument is not a valid image filename");
+                return false;
             }
 
-            return File.Exists(String.Format("{0}/{1}", UploadImagePath, name));
+            return File.Exists(String.Format("{0}/{1}", UploadImagePath, ToValidFileName(fileName)));
+        }
+
+        private bool IsValidFileName(string fileName)
+        {
+            if (AlphanumericFileRegex.IsMatch(fileName) || !ApprovedExtensionsRegex.IsMatch(Path.GetExtension(fileName).ToLower()))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private bool IsValidImage (Image image)
@@ -117,19 +132,12 @@ namespace _2_1_galleriet
             return returnValue;
         }
 
-        private bool IsValidFileName(string fileName)
+        private string ToValidFileName(string fileName)
         {
-            bool returnValue = false;
-
-            // Check for bad given filename
-            if (!SanitizePathRegex.IsMatch(fileName) && // No bad chars are matched
-                ApprovedExtensionsRegex.IsMatch(Path.GetExtension(fileName).ToLower())) // File extension is valid
-            {
-                returnValue = true;
-            }
-
-            return returnValue;
+            return AlphanumericFileRegex.Replace(fileName, "").ToLower();
         }
+
+
 
         public string SaveImage(Stream imageStream, string fileName)
         {
@@ -144,7 +152,7 @@ namespace _2_1_galleriet
              */
 
             // Sanitize filename
-            fileName = SanitizePathRegex.Replace(fileName, "");
+            fileName = ToValidFileName(fileName);
 
             // Check that the filename is allowed
             if (!IsValidFileName(fileName))
@@ -155,7 +163,7 @@ namespace _2_1_galleriet
             // Check that the image does not exist (also checks if file name is valid)
             if (ImageExists(fileName))
             {
-                throw new ArgumentException("Det finns redan en bild med detta filnamn.");
+                fileName = generateNewFilename(fileName);
             }
 
             // Read stream
@@ -177,6 +185,27 @@ namespace _2_1_galleriet
 
             // Create thumbnail from image and Save it.
             resizeImageTo(image, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT).Save(string.Format("{0}/{1}{2}", UploadThumbnailPath, THUMBNAIL_PRE_EXTENSION, fileName));
+
+            return fileName;
+        }
+
+        private string generateNewFilename(string fileName)
+        {
+            int i;
+            string potentialFileName;
+
+            // Generate new filename
+            for (i = 1; i <= GetImageNames().Length + 1; i++)
+            {
+
+                // Generate potential filename
+                potentialFileName = String.Format("{0}{1}{2}", Path.GetFileNameWithoutExtension(fileName), i, Path.GetExtension(fileName));
+                if (!ImageExists(potentialFileName))
+                {
+                    fileName = potentialFileName;
+                    break;
+                }
+            }
 
             return fileName;
         }

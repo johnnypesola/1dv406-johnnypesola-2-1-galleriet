@@ -1,9 +1,20 @@
 ﻿body {
+
     background: url(img/wallpaper_background.png) repeat-x #3d3659;
     text-align: center;
     color: #666666;
     font-family: 'Source Sans Pro', sans-serif;
     margin: 30px;
+}
+
+h1 {
+    color: #FFFFFF;
+    font-size: 42px;
+    position: absolute;
+    top: 0px;
+    right: 30px;
+
+    text-shadow: 0px 0px 5px rgba(150, 150, 150, 1);
 }
 
 input {
@@ -149,6 +160,7 @@ fieldset {
         border: 1px solid #AAAADD;
         display: inline-block;
         background: #EEEEFF;
+        border-radius: 2px;
     }
 
     #ThumbnailContainer .content a.active img {
@@ -198,7 +210,7 @@ fieldset {
 
     display: inline-block;
     max-width: 90%;
-    min-width: 600px;
+    min-width: 100px;
     max-height: 600px;
 
     margin: 20px auto 20px auto;

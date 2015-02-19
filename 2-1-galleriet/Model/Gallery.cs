@@ -89,11 +89,6 @@ namespace _2_1_galleriet
 
         public bool ImageExists(string fileName)
         {
-            /*
-                *  ImageExists är en statisk metod som returnerar true om en bild med angivet namn finns katalogen
-                för uppladdade bilder; annars false.
-                */
-
             // Return false if it isnt a valid filename.
             if (!IsValidFileName(fileName))
             {
@@ -117,11 +112,6 @@ namespace _2_1_galleriet
         {
             bool returnValue = false;
 
-            /*
-             * IsValidImage returnerar true om den uppladdade filens innehåll verkligen är av typen gif, jpeg eller
-                png. Om image refererar till ett System.Drawing.Image-objekt kan dess MIME-typ undersökas med
-                image.RawFormat.Guid == System.Drawing.Imaging.ImageFormat.Gif.Guid.
-             */
             if (image.RawFormat.Guid == System.Drawing.Imaging.ImageFormat.Gif.Guid ||
                 image.RawFormat.Guid == System.Drawing.Imaging.ImageFormat.Jpeg.Guid || 
                 image.RawFormat.Guid == System.Drawing.Imaging.ImageFormat.Png.Guid)
@@ -134,22 +124,14 @@ namespace _2_1_galleriet
 
         private string ToValidFileName(string fileName)
         {
-            return AlphanumericFileRegex.Replace(fileName, "").ToLower();
+            return AlphanumericFileRegex.Replace(fileName, String.Empty).ToLower();
         }
-
-
 
         public string SaveImage(Stream imageStream, string fileName)
         {
             System.IO.MemoryStream imageMemoryStream;
-            System.Drawing.Image image, thumbnail;
+            System.Drawing.Image image;
             byte[] imageData;
-
-            /*
-             * SaveImage verifierar att filen är av rätt MIME-typ (annars kastas ett undantag), säkerställer att
-                filnamnet är unik, sparar bilden samt skapar och sparar en tumnagelbild. Filnamnet bilden sparas
-                under returneras. 
-             */
 
             // Sanitize filename
             fileName = ToValidFileName(fileName);

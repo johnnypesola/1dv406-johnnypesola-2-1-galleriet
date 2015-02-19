@@ -33,8 +33,8 @@
             <asp:Repeater ID="ThumbnailRepeater" runat="server">
                 <ItemTemplate>
                     <asp:HyperLink ID="ThumbnailLink" runat="server"
-                        NavigateUrl='<%# DataBinder.Eval(Container.DataItem, "imagePath")  %>'
-                        CssClass='<%# DataBinder.Eval(Container.DataItem, "cssClass")  %>'
+                        NavigateUrl='<%# Eval("imagePath")  %>'
+                        CssClass='<%# Eval("cssClass")  %>'
                     >
                         <asp:Image ID="ThumbnailImage" runat="server" ImageUrl='<%# DataBinder.Eval(Container.DataItem, "thumbNailPath")  %>' />
                     </asp:HyperLink>
@@ -55,7 +55,7 @@
         </asp:Panel>
         
         <%-- Upload image validators --%>
-        <asp:RequiredFieldValidator ID="FileUploadRequired" runat="server" ErrorMessage="Var god välj en bild som ska laddas upp." ControlToValidate="FileUpload" />
+        <asp:RequiredFieldValidator ID="FileUploadRequired" runat="server" ErrorMessage="Var god välj en bild som ska laddas upp." ControlToValidate="FileUpload" Visible="False" />
         <asp:RegularExpressionValidator ID="FileUploadRegularExpressionValidator" runat="server" ErrorMessage="Bilden måste vara en av typerna: .gif, .png eller .jpg" ControlToValidate="FileUpload" ValidationExpression="(.*?)\.(jpg|JPG|png|PNG|gif|GIF)$" Display="None" />
 
     </form>

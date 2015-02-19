@@ -106,9 +106,9 @@ namespace _2_1_galleriet
                 renderImage(String.Format("{0}/{1}", Gallery.IMAGE_PATH, image));
             }
 
+            // Render thumbnails must me called separately on upload to include uploaded image.
             if (!Page.IsPostBack)
             {
-                // Render thumbnails must me called separately, to include uploaded image.
                 renderThumbnails();
             }
         }
@@ -138,22 +138,21 @@ namespace _2_1_galleriet
                                         Path.GetFileName(FileUpload.PostedFile.FileName)
                                     );
 
+                    // Display success message
                     InfoPanel.Visible = true;
                     InfoPanel.CssClass = "success-message";
                     InfoPanelLiteral.Text = String.Format("Bilden '{0}' har laddats upp.", fileName);
-
-                    //Response.Redirect(String.Format("{0}?img={1}", getPageName(), fileName));
-
-                    //renderImage(String.Format("{0}/{1}", Gallery.IMAGE_PATH, fileName));
                 }
+
+                // Display error message
                 catch (Exception error)
                 {
                     renderErrorMessage(error.Message);
                 }
             }
 
+            // Render thumbnails after potential upload
             renderThumbnails();
-            
         }
     }
 }
